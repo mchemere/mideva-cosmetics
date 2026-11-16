@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | Gifted Hands</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="login-shell">
+  <div class="form-card" style="width:min(100%,460px);">
+    <h1 style="margin-top:0;font-family:Georgia,serif;color:#3a2030;">Gifted Hands Admin</h1>
+    <p class="muted">Sign in to manage bookings, services and inquiries.</p>
+    <form id="admin-login-form">
+      <div class="form-group"><label for="username">Username</label><input id="username" required autocomplete="username" /></div>
+      <div class="form-group"><label for="password">Password</label><input id="password" type="password" required autocomplete="current-password" /></div>
+      <div style="margin-top:1rem;"><button class="btn btn-primary" type="submit" style="width:100%">Log In</button></div>
+      <div id="login-alert" class="alert"></div>
+    </form>
+    <p class="small muted" style="margin-top:1rem;">Administrator accounts must be created securely on the server (see README). Credentials are never hardcoded in production.</p>
+  </div>
+  <script src="/js/config.js"></script>
+  <script src="/js/main.js"></script>
+  <script>
+    const form = document.getElementById('admin-login-form');
+    const alertEl = document.getElementById('login-alert');
+    if (sessionStorage.getItem('gh_admin_token')) window.location.href = '/admin/dashboard.html';
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const res = await apiRequest('/admin/login', { method:'POST', body: JSON.stringify({ username: username.value.trim(), password: password.value }) });
+        sessionStorage.setItem('gh_admin_token', res.token);
+        sessionStorage.setItem('gh_admin_name', res.admin?.username || 'Admin');
+        window.location.href = '/admin/dashboard.html';
+      } catch (err) {
+        showAlert(alertEl, 'error', err.message || 'Login failed');
+      }
+    });
+  </script>
+</body>
+</html>

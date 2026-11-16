@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Appointment | Gifted Hands</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><strong>Gifted Hands</strong><span>Hair Styling & Braiding</span></a><button class="nav-toggle">☰</button><ul class="nav-links"><li><a data-nav href="index.html">Home</a></li><li><a data-nav href="about.html">About</a></li><li><a data-nav href="services.html">Services</a></li><li><a data-nav href="gallery.html">Gallery</a></li><li><a data-nav href="booking.html">Booking</a></li><li><a data-nav href="contact.html">Contact</a></li></ul></div></header>
+  <main>
+    <section class="section section-alt"><div class="container"><h1 class="section-title">Request an Appointment</h1><p class="section-subtitle">Submit your preferred style, date and time. Requests are saved for review and <strong>must be approved by Gifted Hands</strong> before confirmation.</p></div></section>
+    <section class="section"><div class="container grid grid-2" style="align-items:start;">
+      <div class="form-card">
+        <form id="booking-form" novalidate>
+          <div class="form-grid">
+            <div class="form-group"><label for="customer_name">Customer Name *</label><input id="customer_name" name="customer_name" required /></div>
+            <div class="form-group"><label for="phone_number">Phone Number *</label><input id="phone_number" name="phone_number" required placeholder="e.g. 0712117024" /></div>
+            <div class="form-group"><label for="email">Email (optional)</label><input id="email" name="email" type="email" /></div>
+            <div class="form-group"><label for="service_name">Selected Hairstyle *</label><select id="service_name" name="service_name" required><option value="">Select a hairstyle</option></select></div>
+            <div class="form-group"><label for="preferred_date">Preferred Date *</label><input id="preferred_date" name="preferred_date" type="date" required /></div>
+            <div class="form-group"><label for="preferred_time">Preferred Time *</label><input id="preferred_time" name="preferred_time" type="time" required /></div>
+            <div class="form-group full"><label for="message">Additional Message</label><textarea id="message" name="message" placeholder="Any details you'd like to share"></textarea></div>
+          </div>
+          <input type="hidden" id="service_id" name="service_id" />
+          <div class="stack" style="margin-top:1rem;">
+            <button class="btn btn-primary" type="submit">Submit Booking Request</button>
+            <button class="btn btn-secondary" type="button" id="wa-booking">Send via WhatsApp</button>
+          </div>
+          <div id="booking-alert" class="alert"></div>
+        </form>
+      </div>
+      <div>
+        <div class="card" style="padding:1.4rem; margin-bottom:1rem;"><h3>Booking information</h3><ul class="contact-list"><li><strong>Phone:</strong> <a data-phone-link><span data-phone></span></a></li><li><strong>WhatsApp:</strong> <a data-whatsapp data-message="Hello Gifted Hands, I would like to make a booking inquiry.">Chat on WhatsApp</a></li><li><strong>Note:</strong> Appointment requests are reviewed by the business owner. You will be contacted for confirmation.</li></ul></div>
+        <div class="card" style="padding:1.4rem;"><h3>Need help choosing?</h3><p class="muted">You can send us a message on WhatsApp with your preferred style, date and time, and we'll guide you.</p></div>
+      </div>
+    </div></section>
+  </main>
+  <footer><div class="container footer-grid"><div><h3>Gifted Hands</h3><p>Professional hair styling and braiding.</p></div><div><h4>Services</h4><p><a href="services.html">View styles</a></p></div><div><h4>Contact</h4><p><a data-phone-link><span data-phone></span></a></p></div></div><div class="container footer-bottom">© <span id="year"></span> Gifted Hands.</div></footer>
+  <a class="whatsapp-float" data-whatsapp>WhatsApp</a>
+  <script src="/js/config.js"></script><script src="/js/main.js"></script>
+  <script src="/js/booking.js"></script>
+</body>
+</html>
