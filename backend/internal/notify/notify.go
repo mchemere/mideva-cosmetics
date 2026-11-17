@@ -1,6 +1,8 @@
 package notify
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -69,6 +71,8 @@ func (n *Notifier) sendSMS(b models.Booking) {
 	switch strings.ToLower(c.SMSProvider) {
 	case "twilio":
 		n.sendTwilio(text)
+	case "textbee":
+		n.sendTextbee(text)
 	default:
 		n.sendAfricasTalking(text)
 	}
@@ -135,6 +139,52 @@ func (n *Notifier) sendTwilio(text string) {
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		log.Printf("booking sms notification failed: Twilio returned %s", resp.Status)
+	}
+}
+
+func (n *Notifier) sendTextbee(text string) {
+	c := n.cfg
+	if c.TextbeeAPIKey == "" {
+		return
+	}
+	payload := map[string]any{
+		"message":    text,
+		"recipients": []string{c.NotifyPhone},
+	}
+	if c.TextbeeDeviceID != "" {
+		payload["deviceId"] = c.TextbeeDeviceID
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("booking sms notification failed: %v", err)
+		return
+	}
+	endpoint := strings.TrimRight(c.TextbeeBaseURL, "/") + "/gateway/send-sms"
+	req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
+	if err != nil {
+		log.Printf("booking sms notification failed: %v", err)
+		return
+	}
+	req.Header.Set("x-api-key", c.TextbeeAPIKey)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := n.client.Do(req)
+	if err != nil {
+		log.Printf("booking sms notification failed: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		response, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		var detail struct {
+			Message string `json:"message"`
+		}
+		_ = json.Unmarshal(response, &detail)
+		if detail.Message != "" {
+			log.Printf("booking sms notification failed: textbee: %s", detail.Message)
+			return
+		}
+		log.Printf("booking sms notification failed: textbee returned %s: %s", resp.Status, strings.TrimSpace(string(response)))
 	}
 }
 

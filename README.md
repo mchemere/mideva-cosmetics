@@ -111,6 +111,14 @@ A complete, responsive website foundation for **Gifted Hands**, a hair styling a
    - `JWT_SECRET` – long random secret for admin tokens (**change in production**)
    - `ADMIN_SESSION_HOURS` – admin token/session lifetime
 
+### Booking notifications
+
+New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHONE` (leave either blank to disable that channel). SMS supports three providers via `SMS_PROVIDER`:
+
+- `africastalking` (default) – set `AT_USERNAME`, `AT_API_KEY`, optional `AT_SENDER`. Use a live app username; `sandbox` does not deliver real SMS.
+- `twilio` – set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`.
+- `textbee` – free tier (300 SMS/month, 50/day) using an Android phone and SIM you own as the gateway. Set `TEXTBEE_API_KEY` (from the textbee dashboard), optionally `TEXTBEE_DEVICE_ID` to pick a phone, and link the phone in the textbee app. The phone must stay powered and connected. `TEXTBEE_BASE_URL` defaults to `https://api.textbee.dev/api/v1`.
+
 > **Security:** Never commit real `.env` secrets. Database credentials are server-side only and never exposed to frontend code.
 
 ## Database Setup

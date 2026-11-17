@@ -33,6 +33,10 @@ type Config struct {
 	TwilioSID   string
 	TwilioToken string
 	TwilioFrom  string
+
+	TextbeeAPIKey   string
+	TextbeeDeviceID string
+	TextbeeBaseURL  string
 }
 
 func Load() (*Config, error) {
@@ -75,6 +79,10 @@ func Load() (*Config, error) {
 		TwilioSID:   os.Getenv("TWILIO_ACCOUNT_SID"),
 		TwilioToken: os.Getenv("TWILIO_AUTH_TOKEN"),
 		TwilioFrom:  os.Getenv("TWILIO_FROM"),
+
+		TextbeeAPIKey:   os.Getenv("TEXTBEE_API_KEY"),
+		TextbeeDeviceID: os.Getenv("TEXTBEE_DEVICE_ID"),
+		TextbeeBaseURL:  getenv("TEXTBEE_BASE_URL", "https://api.textbee.dev/api/v1"),
 	}, nil
 }
 
