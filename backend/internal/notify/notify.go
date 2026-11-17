@@ -2,6 +2,7 @@ package notify
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -85,7 +86,11 @@ func (n *Notifier) sendAfricasTalking(text string) {
 	if c.ATSender != "" {
 		form.Set("from", c.ATSender)
 	}
-	req, err := http.NewRequest(http.MethodPost, "https://api.africastalking.com/version1/messaging", strings.NewReader(form.Encode()))
+	endpoint := "https://api.africastalking.com/version1/messaging"
+	if strings.EqualFold(c.ATUsername, "sandbox") {
+		endpoint = "https://api.sandbox.africastalking.com/version1/messaging"
+	}
+	req, err := http.NewRequest(http.MethodPost, endpoint, strings.NewReader(form.Encode()))
 	if err != nil {
 		log.Printf("booking sms notification failed: %v", err)
 		return
@@ -100,7 +105,8 @@ func (n *Notifier) sendAfricasTalking(text string) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		log.Printf("booking sms notification failed: Africa's Talking returned %s", resp.Status)
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		log.Printf("booking sms notification failed: Africa's Talking returned %s: %s", resp.Status, strings.TrimSpace(string(body)))
 	}
 }
 
