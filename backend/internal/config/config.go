@@ -16,6 +16,23 @@ type Config struct {
 	AllowedOrigins    []string
 	JWTSecret         string
 	AdminSessionHours time.Duration
+
+	NotifyEmail string
+	NotifyPhone string
+
+	SMTPHost string
+	SMTPPort string
+	SMTPUser string
+	SMTPPass string
+	SMTPFrom string
+
+	SMSProvider string
+	ATUsername  string
+	ATApiKey    string
+	ATSender    string
+	TwilioSID   string
+	TwilioToken string
+	TwilioFrom  string
 }
 
 func Load() (*Config, error) {
@@ -41,6 +58,23 @@ func Load() (*Config, error) {
 		AllowedOrigins:    origins,
 		JWTSecret:         jwtSecret,
 		AdminSessionHours: time.Duration(hours) * time.Hour,
+
+		NotifyEmail: os.Getenv("NOTIFY_EMAIL"),
+		NotifyPhone: os.Getenv("NOTIFY_PHONE"),
+
+		SMTPHost: getenv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort: getenv("SMTP_PORT", "587"),
+		SMTPUser: os.Getenv("SMTP_USER"),
+		SMTPPass: os.Getenv("SMTP_PASS"),
+		SMTPFrom: os.Getenv("SMTP_FROM"),
+
+		SMSProvider: getenv("SMS_PROVIDER", "africastalking"),
+		ATUsername:  os.Getenv("AT_USERNAME"),
+		ATApiKey:    os.Getenv("AT_API_KEY"),
+		ATSender:    os.Getenv("AT_SENDER"),
+		TwilioSID:   os.Getenv("TWILIO_ACCOUNT_SID"),
+		TwilioToken: os.Getenv("TWILIO_AUTH_TOKEN"),
+		TwilioFrom:  os.Getenv("TWILIO_FROM"),
 	}, nil
 }
 

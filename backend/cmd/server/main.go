@@ -11,6 +11,7 @@ import (
 	"github.com/mchemere/gifted-hands/backend/internal/database"
 	"github.com/mchemere/gifted-hands/backend/internal/handlers"
 	"github.com/mchemere/gifted-hands/backend/internal/middleware"
+	"github.com/mchemere/gifted-hands/backend/internal/notify"
 	"github.com/mchemere/gifted-hands/backend/internal/repository"
 )
 
@@ -31,6 +32,7 @@ func main() {
 		Services:  &repository.ServiceRepository{DB: db},
 		Bookings:  &repository.BookingRepository{DB: db},
 		Inquiries: &repository.InquiryRepository{DB: db},
+		Notifier:  notify.New(cfg),
 	}
 
 	mux := http.NewServeMux()

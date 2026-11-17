@@ -12,6 +12,7 @@ import (
 	"github.com/mchemere/gifted-hands/backend/internal/auth"
 	"github.com/mchemere/gifted-hands/backend/internal/config"
 	"github.com/mchemere/gifted-hands/backend/internal/models"
+	"github.com/mchemere/gifted-hands/backend/internal/notify"
 	"github.com/mchemere/gifted-hands/backend/internal/repository"
 	"github.com/mchemere/gifted-hands/backend/internal/util"
 )
@@ -22,6 +23,7 @@ type API struct {
 	Services  *repository.ServiceRepository
 	Bookings  *repository.BookingRepository
 	Inquiries *repository.InquiryRepository
+	Notifier  *notify.Notifier
 }
 
 func (a *API) Health(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +90,9 @@ func (a *API) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	if err := a.Bookings.Create(r.Context(), b); err != nil {
 		util.Error(w, http.StatusInternalServerError, "failed to submit booking request")
 		return
+	}
+	if a.Notifier != nil {
+		a.Notifier.Booking(*b)
 	}
 	util.JSON(w, http.StatusCreated, map[string]any{"message": "Booking request received. We will contact you to confirm.", "booking": b})
 }
