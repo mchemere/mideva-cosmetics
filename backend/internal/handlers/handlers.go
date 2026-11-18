@@ -27,7 +27,15 @@ type API struct {
 }
 
 func (a *API) Health(w http.ResponseWriter, r *http.Request) {
-	util.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	provider := "disabled"
+	if a.Cfg != nil {
+		if a.Cfg.GmailClientID != "" && a.Cfg.GmailClientSecret != "" && a.Cfg.GmailRefreshToken != "" {
+			provider = "gmail"
+		} else if a.Cfg.SMTPUser != "" && a.Cfg.SMTPPass != "" {
+			provider = "smtp"
+		}
+	}
+	util.JSON(w, http.StatusOK, map[string]string{"status": "ok", "email_provider": provider})
 }
 
 // Public: list active services
