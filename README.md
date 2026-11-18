@@ -113,7 +113,21 @@ A complete, responsive website foundation for **Gifted Hands**, a hair styling a
 
 ### Booking notifications
 
-New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHONE` (leave either blank to disable that channel). SMS supports three providers via `SMS_PROVIDER`:
+New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHONE` (leave either blank to disable that channel).
+
+**Email on Render Free:** Render blocks outbound SMTP ports `25`, `465`, and `587` on Free services, so Gmail SMTP times out there. Use the Gmail API instead (HTTPS, port `443`):
+
+1. In Google Cloud Console, create/select a project and enable the **Gmail API**.
+2. Configure the OAuth consent screen as **External**, add the sending Gmail address as a test user, and add scope `https://www.googleapis.com/auth/gmail.send`.
+3. Create an **OAuth client ID** of type **Web application** with authorized redirect URI `http://localhost:8080/oauth2/callback`.
+4. Generate a refresh token locally:
+   ```bash
+   GMAIL_CLIENT_ID=YOUR_CLIENT_ID GMAIL_CLIENT_SECRET=YOUR_CLIENT_SECRET go run ./backend/cmd/gmailauth
+   ```
+   Open the printed URL, sign in as the sending Gmail account, approve access, then copy the printed `GMAIL_REFRESH_TOKEN`.
+5. In Render, set `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, and `GMAIL_REFRESH_TOKEN` (plus `NOTIFY_EMAIL` for the recipient) and redeploy. When all three Gmail variables are present, the app sends via Gmail API automatically; SMTP remains the fallback for local development.
+
+SMS supports three providers via `SMS_PROVIDER`:
 
 - `africastalking` (default) – set `AT_USERNAME`, `AT_API_KEY`, optional `AT_SENDER`. Use a live app username; `sandbox` does not deliver real SMS.
 - `twilio` – set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`.
@@ -125,7 +139,7 @@ GitHub Pages deploys only `frontend/` (currently at `https://mchemere.github.io/
 
 1. Create a PostgreSQL database (for example a free Neon database) and run `migrations/001_init.sql` then `migrations/002_seed_services.sql` in its SQL editor.
 2. Commit and push these changes first: GitHub Pages deploys only committed files, so the `apiBase` fix in `frontend/js/config.js` and `render.yaml` must be on `main`.
-3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it bookings fail with HTTP 500.
+3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it bookings fail with HTTP 500.
 4. Copy the deployed service URL and set `ghRemoteApiBase` in `frontend/js/config.js` to that URL with `/api` appended (for example `https://gifted-hands-api.onrender.com/api`). Push again so Pages picks it up. Alternatively set `window.GH_API_BASE` in an inline script before `js/config.js` on each page.
 5. Verify the deployment:
    ```bash

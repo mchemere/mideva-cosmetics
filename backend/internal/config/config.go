@@ -20,6 +20,11 @@ type Config struct {
 	NotifyEmail string
 	NotifyPhone string
 
+	GmailClientID     string
+	GmailClientSecret string
+	GmailRefreshToken string
+	GmailRedirectURI  string
+
 	SMTPHost string
 	SMTPPort string
 	SMTPUser string
@@ -65,6 +70,11 @@ func Load() (*Config, error) {
 
 		NotifyEmail: os.Getenv("NOTIFY_EMAIL"),
 		NotifyPhone: os.Getenv("NOTIFY_PHONE"),
+
+		GmailClientID:     os.Getenv("GMAIL_CLIENT_ID"),
+		GmailClientSecret: os.Getenv("GMAIL_CLIENT_SECRET"),
+		GmailRefreshToken: os.Getenv("GMAIL_REFRESH_TOKEN"),
+		GmailRedirectURI:  getenv("GMAIL_REDIRECT_URI", "http://localhost:8080/oauth2/callback"),
 
 		SMTPHost: getenv("SMTP_HOST", "smtp.gmail.com"),
 		SMTPPort: getenv("SMTP_PORT", "587"),

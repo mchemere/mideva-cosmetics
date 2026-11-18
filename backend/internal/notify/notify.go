@@ -3,6 +3,7 @@ package notify
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -40,13 +41,21 @@ func (n *Notifier) Booking(b models.Booking) {
 
 func (n *Notifier) sendEmail(b models.Booking) {
 	c := n.cfg
-	if c.NotifyEmail == "" || c.SMTPUser == "" || c.SMTPPass == "" {
-		log.Printf("booking %d email notification skipped: NOTIFY_EMAIL, SMTP_USER and SMTP_PASS must be set", b.ID)
+	if c.NotifyEmail == "" {
+		log.Printf("booking %d email notification skipped: NOTIFY_EMAIL must be set", b.ID)
+		return
+	}
+	gmail := n.gmailEnabled()
+	if !gmail && (c.SMTPUser == "" || c.SMTPPass == "") {
+		log.Printf("booking %d email notification skipped: Gmail API credentials or SMTP_USER/SMTP_PASS must be set", b.ID)
 		return
 	}
 	from := c.SMTPFrom
 	if from == "" {
 		from = c.SMTPUser
+	}
+	if from == "" {
+		from = c.NotifyEmail
 	}
 	messageID := fmt.Sprintf("<%d.%d@%s>", b.ID, time.Now().UnixNano(), c.SMTPHost)
 	subject := "New booking request from " + headerSafe(b.CustomerName)
@@ -55,17 +64,104 @@ func (n *Notifier) sendEmail(b models.Booking) {
 		"From: " + headerSafe(from) + "\r\n" +
 			"To: " + headerSafe(c.NotifyEmail) + "\r\n" +
 			"Subject: " + subject + "\r\n" +
+			"Date: " + time.Now().Format(time.RFC1123Z) + "\r\n" +
 			"Message-ID: " + messageID + "\r\n" +
 			"MIME-Version: 1.0\r\n" +
 			"Content-Type: text/plain; charset=UTF-8\r\n" +
 			"\r\n" + body + "\r\n",
 	)
-	log.Printf("booking %d email notification starting: from=%s to=%s host=%s port=%s message_id=%s", b.ID, from, c.NotifyEmail, c.SMTPHost, c.SMTPPort, messageID)
-	if err := n.sendSMTP(from, c.NotifyEmail, messageID, msg); err != nil {
+	provider := "smtp"
+	target := c.SMTPHost + ":" + c.SMTPPort
+	if gmail {
+		provider = "gmail"
+		target = "gmail.googleapis.com"
+	}
+	log.Printf("booking %d email notification starting: provider=%s from=%s to=%s target=%s message_id=%s", b.ID, provider, from, c.NotifyEmail, target, messageID)
+	var err error
+	if gmail {
+		err = n.sendGmail(messageID, msg)
+	} else {
+		err = n.sendSMTP(from, c.NotifyEmail, messageID, msg)
+	}
+	if err != nil {
 		log.Printf("booking %d email notification failed: %v", b.ID, err)
 		return
 	}
 	log.Printf("booking %d email notification sent to %s message_id=%s", b.ID, c.NotifyEmail, messageID)
+}
+
+func (n *Notifier) gmailEnabled() bool {
+	c := n.cfg
+	return c.GmailClientID != "" && c.GmailClientSecret != "" && c.GmailRefreshToken != ""
+}
+
+func (n *Notifier) gmailAccessToken() (string, error) {
+	c := n.cfg
+	form := url.Values{
+		"client_id":     {c.GmailClientID},
+		"client_secret": {c.GmailClientSecret},
+		"refresh_token": {c.GmailRefreshToken},
+		"grant_type":    {"refresh_token"},
+	}
+	resp, err := n.client.PostForm("https://oauth2.googleapis.com/token", form)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return "", err
+	}
+	var result struct {
+		AccessToken      string `json:"access_token"`
+		Error            string `json:"error"`
+		ErrorDescription string `json:"error_description"`
+	}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", fmt.Errorf("decode token response: %w", err)
+	}
+	if result.AccessToken == "" {
+		return "", fmt.Errorf("token response status=%d error=%s description=%s", resp.StatusCode, result.Error, result.ErrorDescription)
+	}
+	return result.AccessToken, nil
+}
+
+func (n *Notifier) sendGmail(messageID string, msg []byte) error {
+	token, err := n.gmailAccessToken()
+	if err != nil {
+		log.Printf("gmail phase=token failed: %v", err)
+		return err
+	}
+	log.Printf("gmail phase=token ok")
+	payload, err := json.Marshal(map[string]string{"raw": base64.RawURLEncoding.EncodeToString(msg)})
+	if err != nil {
+		log.Printf("gmail phase=encode failed: %v", err)
+		return err
+	}
+	req, err := http.NewRequest(http.MethodPost, "https://gmail.googleapis.com/gmail/v1/users/me/messages", bytes.NewReader(payload))
+	if err != nil {
+		log.Printf("gmail phase=request failed: %v", err)
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := n.client.Do(req)
+	if err != nil {
+		log.Printf("gmail phase=send failed: %v", err)
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		log.Printf("gmail phase=read_response failed: %v", err)
+		return err
+	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		log.Printf("gmail phase=send status=%d body=%s", resp.StatusCode, strings.TrimSpace(string(body)))
+		return fmt.Errorf("gmail send failed with status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+	}
+	log.Printf("gmail phase=send status=%d message_id=%s ok", resp.StatusCode, messageID)
+	return nil
 }
 
 type smtpLogConn struct {
