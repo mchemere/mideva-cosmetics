@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: gifted-hands-api
+    runtime: go
+    plan: free
+    region: frankfurt
+    buildCommand: go build -o server ./backend/cmd/server
+    startCommand: ./server
+    healthCheckPath: /api/health
+    envVars:
+      - key: FRONTEND_DIR
+        value: ./frontend
+      - key: ALLOWED_ORIGINS
+        value: https://mchemere.github.io,http://localhost:8080,http://127.0.0.1:8080
+      - key: ADMIN_SESSION_HOURS
+        value: "24"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: NOTIFY_PHONE
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: SMS_PROVIDER
+        value: textbee
+      - key: TEXTBEE_API_KEY
+        sync: false
+      - key: TEXTBEE_DEVICE_ID
+        sync: false
+      - key: TEXTBEE_BASE_URL
+        value: https://api.textbee.dev/api/v1

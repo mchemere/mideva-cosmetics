@@ -119,6 +119,23 @@ New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHO
 - `twilio` – set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`.
 - `textbee` – free tier (300 SMS/month, 50/day) using an Android phone and SIM you own as the gateway. Set `TEXTBEE_API_KEY` (from the textbee dashboard), optionally `TEXTBEE_DEVICE_ID` to pick a phone, and link the phone in the textbee app. The phone must stay powered and connected. `TEXTBEE_BASE_URL` defaults to `https://api.textbee.dev/api/v1`.
 
+### Remote API for GitHub Pages
+
+GitHub Pages deploys only `frontend/` (currently at `https://mchemere.github.io/mideva-cosmetics/`), so it cannot run the Go API or send notifications. `render.yaml` defines a free Render web service, but the PostgreSQL database must be created separately:
+
+1. Create a PostgreSQL database (for example a free Neon database) and run `migrations/001_init.sql` then `migrations/002_seed_services.sql` in its SQL editor.
+2. Commit and push these changes first: GitHub Pages deploys only committed files, so the `apiBase` fix in `frontend/js/config.js` and `render.yaml` must be on `main`.
+3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it bookings fail with HTTP 500.
+4. Copy the deployed service URL and set `ghRemoteApiBase` in `frontend/js/config.js` to that URL with `/api` appended (for example `https://gifted-hands-api.onrender.com/api`). Push again so Pages picks it up. Alternatively set `window.GH_API_BASE` in an inline script before `js/config.js` on each page.
+5. Verify the deployment:
+   ```bash
+   curl -s https://YOUR-SERVICE.onrender.com/api/health
+   curl -s -i -X OPTIONS -H 'Origin: https://mchemere.github.io' -H 'Access-Control-Request-Method: POST' https://YOUR-SERVICE.onrender.com/api/bookings
+   ```
+   Health must return `{"status":"ok"}` and the preflight must include `Access-Control-Allow-Origin: https://mchemere.github.io`. `ALLOWED_ORIGINS` in `render.yaml` already contains that origin (plus localhost for development); the Pages project path is not part of an origin.
+6. Submit a test booking on the live site, then confirm it appears in the admin dashboard and that the notification logs show delivery.
+7. Optional: ping `/api/health` every 10 minutes with a free uptime monitor so the free Render instance doesn't sleep before a booking.
+
 > **Security:** Never commit real `.env` secrets. Database credentials are server-side only and never exposed to frontend code.
 
 ## Database Setup

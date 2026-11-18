@@ -28,12 +28,22 @@
 })();
 
 async function apiRequest(path, options = {}) {
-  const res = await fetch(`${window.GH_CONFIG.apiBase}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  let res;
+  try {
+    res = await fetch(`${window.GH_CONFIG.apiBase}${path}`, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    });
+  } catch (e) {
+    throw new Error('Cannot reach the booking service. Please try again or use WhatsApp.');
+  }
+  const text = await res.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch (e) { data = {}; }
+  if (!res.ok) {
+    const message = data.error || (res.status === 404 ? 'Booking service is not available at this address.' : `Request failed (${res.status})`);
+    throw new Error(message);
+  }
   return data;
 }
 

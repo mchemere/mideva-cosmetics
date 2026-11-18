@@ -39,6 +39,7 @@ func (n *Notifier) Booking(b models.Booking) {
 func (n *Notifier) sendEmail(b models.Booking) {
 	c := n.cfg
 	if c.NotifyEmail == "" || c.SMTPUser == "" || c.SMTPPass == "" {
+		log.Printf("booking email notification skipped: NOTIFY_EMAIL, SMTP_USER and SMTP_PASS must be set")
 		return
 	}
 	from := c.SMTPFrom
@@ -59,7 +60,9 @@ func (n *Notifier) sendEmail(b models.Booking) {
 	auth := smtp.PlainAuth("", c.SMTPUser, c.SMTPPass, c.SMTPHost)
 	if err := smtp.SendMail(addr, auth, from, []string{c.NotifyEmail}, msg); err != nil {
 		log.Printf("booking email notification failed: %v", err)
+		return
 	}
+	log.Printf("booking email notification sent to %s", c.NotifyEmail)
 }
 
 func (n *Notifier) sendSMS(b models.Booking) {
