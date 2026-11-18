@@ -2,10 +2,12 @@ package notify
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/smtp"
 	"net/url"
@@ -39,30 +41,123 @@ func (n *Notifier) Booking(b models.Booking) {
 func (n *Notifier) sendEmail(b models.Booking) {
 	c := n.cfg
 	if c.NotifyEmail == "" || c.SMTPUser == "" || c.SMTPPass == "" {
-		log.Printf("booking email notification skipped: NOTIFY_EMAIL, SMTP_USER and SMTP_PASS must be set")
+		log.Printf("booking %d email notification skipped: NOTIFY_EMAIL, SMTP_USER and SMTP_PASS must be set", b.ID)
 		return
 	}
 	from := c.SMTPFrom
 	if from == "" {
 		from = c.SMTPUser
 	}
+	messageID := fmt.Sprintf("<%d.%d@%s>", b.ID, time.Now().UnixNano(), c.SMTPHost)
 	subject := "New booking request from " + headerSafe(b.CustomerName)
 	body := bookingText(b)
 	msg := []byte(
 		"From: " + headerSafe(from) + "\r\n" +
 			"To: " + headerSafe(c.NotifyEmail) + "\r\n" +
 			"Subject: " + subject + "\r\n" +
+			"Message-ID: " + messageID + "\r\n" +
 			"MIME-Version: 1.0\r\n" +
 			"Content-Type: text/plain; charset=UTF-8\r\n" +
 			"\r\n" + body + "\r\n",
 	)
-	addr := c.SMTPHost + ":" + c.SMTPPort
-	auth := smtp.PlainAuth("", c.SMTPUser, c.SMTPPass, c.SMTPHost)
-	if err := smtp.SendMail(addr, auth, from, []string{c.NotifyEmail}, msg); err != nil {
-		log.Printf("booking email notification failed: %v", err)
+	log.Printf("booking %d email notification starting: from=%s to=%s host=%s port=%s message_id=%s", b.ID, from, c.NotifyEmail, c.SMTPHost, c.SMTPPort, messageID)
+	if err := n.sendSMTP(from, c.NotifyEmail, messageID, msg); err != nil {
+		log.Printf("booking %d email notification failed: %v", b.ID, err)
 		return
 	}
-	log.Printf("booking email notification sent to %s", c.NotifyEmail)
+	log.Printf("booking %d email notification sent to %s message_id=%s", b.ID, c.NotifyEmail, messageID)
+}
+
+type smtpLogConn struct {
+	net.Conn
+}
+
+func (c smtpLogConn) Read(b []byte) (int, error) {
+	n, err := c.Conn.Read(b)
+	if n > 0 {
+		log.Printf("smtp <- %s", strings.TrimSpace(string(b[:n])))
+	}
+	return n, err
+}
+
+func (n *Notifier) sendSMTP(from, to, messageID string, msg []byte) error {
+	c := n.cfg
+	addr := net.JoinHostPort(c.SMTPHost, c.SMTPPort)
+	log.Printf("smtp phase=connect addr=%s", addr)
+	dialer := &net.Dialer{Timeout: 10 * time.Second}
+	conn, err := dialer.Dial("tcp", addr)
+	if err != nil {
+		log.Printf("smtp phase=connect failed: %v", err)
+		return err
+	}
+	defer conn.Close()
+
+	client, err := smtp.NewClient(smtpLogConn{Conn: conn}, c.SMTPHost)
+	if err != nil {
+		log.Printf("smtp phase=new_client failed: %v", err)
+		return err
+	}
+	defer client.Close()
+
+	if err := client.Hello("localhost"); err != nil {
+		log.Printf("smtp phase=hello failed: %v", err)
+		return err
+	}
+	log.Printf("smtp phase=hello ok")
+
+	if ok, _ := client.Extension("STARTTLS"); ok {
+		if err := client.StartTLS(&tls.Config{ServerName: c.SMTPHost, MinVersion: tls.VersionTLS12}); err != nil {
+			log.Printf("smtp phase=starttls failed: %v", err)
+			return err
+		}
+		log.Printf("smtp phase=starttls ok")
+		if err := client.Hello("localhost"); err != nil {
+			log.Printf("smtp phase=hello_after_tls failed: %v", err)
+			return err
+		}
+		log.Printf("smtp phase=hello_after_tls ok")
+	}
+
+	if err := client.Auth(smtp.PlainAuth("", c.SMTPUser, c.SMTPPass, c.SMTPHost)); err != nil {
+		log.Printf("smtp phase=auth failed: %v", err)
+		return err
+	}
+	log.Printf("smtp phase=auth ok")
+
+	if err := client.Mail(from); err != nil {
+		log.Printf("smtp phase=mail_from from=%s failed: %v", from, err)
+		return err
+	}
+	log.Printf("smtp phase=mail_from from=%s ok", from)
+
+	if err := client.Rcpt(to); err != nil {
+		log.Printf("smtp phase=rcpt_to to=%s failed: %v", to, err)
+		return err
+	}
+	log.Printf("smtp phase=rcpt_to to=%s ok", to)
+
+	w, err := client.Data()
+	if err != nil {
+		log.Printf("smtp phase=data_open failed: %v", err)
+		return err
+	}
+	if _, err := w.Write(msg); err != nil {
+		log.Printf("smtp phase=data_write failed: %v", err)
+		w.Close()
+		return err
+	}
+	if err := w.Close(); err != nil {
+		log.Printf("smtp phase=data_close message_id=%s failed: %v", messageID, err)
+		return err
+	}
+	log.Printf("smtp phase=data_close message_id=%s ok", messageID)
+
+	if err := client.Quit(); err != nil {
+		log.Printf("smtp phase=quit failed: %v", err)
+		return err
+	}
+	log.Printf("smtp phase=quit ok")
+	return nil
 }
 
 func (n *Notifier) sendSMS(b models.Booking) {
