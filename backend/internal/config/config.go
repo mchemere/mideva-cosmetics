@@ -60,6 +60,13 @@ func Load() (*Config, error) {
 	}
 	origins := splitAndTrim(getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080"))
 
+	smtpHost := getenv("SMTP_HOST", "smtp.gmail.com")
+	smtpPass := os.Getenv("SMTP_PASS")
+	hostLower := strings.ToLower(smtpHost)
+	if strings.HasSuffix(hostLower, "gmail.com") || strings.HasSuffix(hostLower, "googlemail.com") {
+		smtpPass = strings.Join(strings.Fields(smtpPass), "")
+	}
+
 	return &Config{
 		Port:              port,
 		DatabaseURL:       dbURL,
@@ -76,10 +83,10 @@ func Load() (*Config, error) {
 		GmailRefreshToken: os.Getenv("GMAIL_REFRESH_TOKEN"),
 		GmailRedirectURI:  getenv("GMAIL_REDIRECT_URI", "http://localhost:8080/oauth2/callback"),
 
-		SMTPHost: getenv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPHost: smtpHost,
 		SMTPPort: getenv("SMTP_PORT", "587"),
 		SMTPUser: os.Getenv("SMTP_USER"),
-		SMTPPass: os.Getenv("SMTP_PASS"),
+		SMTPPass: smtpPass,
 		SMTPFrom: os.Getenv("SMTP_FROM"),
 
 		SMSProvider: getenv("SMS_PROVIDER", "africastalking"),

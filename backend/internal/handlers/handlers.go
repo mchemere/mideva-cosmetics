@@ -34,12 +34,20 @@ func (a *API) Health(w http.ResponseWriter, r *http.Request) {
 		"gmail_client_secret_set": false,
 		"gmail_refresh_token_set": false,
 		"smtp_set":                false,
+		"sms_provider":            "disabled",
+		"notify_phone_set":        false,
+		"textbee_api_key_set":     false,
+		"textbee_device_id_set":   false,
 	}
 	if a.Cfg != nil {
 		response["gmail_client_id_set"] = a.Cfg.GmailClientID != ""
 		response["gmail_client_secret_set"] = a.Cfg.GmailClientSecret != ""
 		response["gmail_refresh_token_set"] = a.Cfg.GmailRefreshToken != ""
 		response["smtp_set"] = a.Cfg.SMTPUser != "" && a.Cfg.SMTPPass != ""
+		response["sms_provider"] = a.Cfg.SMSProvider
+		response["notify_phone_set"] = a.Cfg.NotifyPhone != ""
+		response["textbee_api_key_set"] = a.Cfg.TextbeeAPIKey != ""
+		response["textbee_device_id_set"] = a.Cfg.TextbeeDeviceID != ""
 		if a.Cfg.GmailClientID != "" && a.Cfg.GmailClientSecret != "" && a.Cfg.GmailRefreshToken != "" {
 			response["email_provider"] = "gmail"
 		} else if a.Cfg.SMTPUser != "" && a.Cfg.SMTPPass != "" {

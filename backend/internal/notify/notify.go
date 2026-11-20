@@ -13,6 +13,7 @@ import (
 	"net/smtp"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/mchemere/gifted-hands/backend/internal/config"
@@ -166,11 +167,12 @@ func (n *Notifier) sendGmail(messageID string, msg []byte) error {
 
 type smtpLogConn struct {
 	net.Conn
+	logReads *atomic.Bool
 }
 
 func (c smtpLogConn) Read(b []byte) (int, error) {
 	n, err := c.Conn.Read(b)
-	if n > 0 {
+	if n > 0 && c.logReads != nil && c.logReads.Load() {
 		log.Printf("smtp <- %s", strings.TrimSpace(string(b[:n])))
 	}
 	return n, err
@@ -188,7 +190,9 @@ func (n *Notifier) sendSMTP(from, to, messageID string, msg []byte) error {
 	}
 	defer conn.Close()
 
-	client, err := smtp.NewClient(smtpLogConn{Conn: conn}, c.SMTPHost)
+	logReads := &atomic.Bool{}
+	logReads.Store(true)
+	client, err := smtp.NewClient(smtpLogConn{Conn: conn, logReads: logReads}, c.SMTPHost)
 	if err != nil {
 		log.Printf("smtp phase=new_client failed: %v", err)
 		return err
@@ -202,16 +206,12 @@ func (n *Notifier) sendSMTP(from, to, messageID string, msg []byte) error {
 	log.Printf("smtp phase=hello ok")
 
 	if ok, _ := client.Extension("STARTTLS"); ok {
+		logReads.Store(false)
 		if err := client.StartTLS(&tls.Config{ServerName: c.SMTPHost, MinVersion: tls.VersionTLS12}); err != nil {
 			log.Printf("smtp phase=starttls failed: %v", err)
 			return err
 		}
 		log.Printf("smtp phase=starttls ok")
-		if err := client.Hello("localhost"); err != nil {
-			log.Printf("smtp phase=hello_after_tls failed: %v", err)
-			return err
-		}
-		log.Printf("smtp phase=hello_after_tls ok")
 	}
 
 	if err := client.Auth(smtp.PlainAuth("", c.SMTPUser, c.SMTPPass, c.SMTPHost)); err != nil {
@@ -339,21 +339,31 @@ func (n *Notifier) sendTwilio(text string) {
 func (n *Notifier) sendTextbee(text string) {
 	c := n.cfg
 	if c.TextbeeAPIKey == "" {
+		log.Printf("booking sms notification skipped: textbee: TEXTBEE_API_KEY must be set")
+		return
+	}
+	phone := strings.TrimSpace(c.NotifyPhone)
+	if phone == "" {
+		log.Printf("booking sms notification skipped: textbee: NOTIFY_PHONE must be set")
 		return
 	}
 	payload := map[string]any{
 		"message":    text,
-		"recipients": []string{c.NotifyPhone},
+		"recipients": []string{phone},
 	}
-	if c.TextbeeDeviceID != "" {
-		payload["deviceId"] = c.TextbeeDeviceID
+	if deviceID := strings.TrimSpace(c.TextbeeDeviceID); deviceID != "" {
+		payload["deviceId"] = deviceID
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("booking sms notification failed: %v", err)
 		return
 	}
-	endpoint := strings.TrimRight(c.TextbeeBaseURL, "/") + "/gateway/send-sms"
+	baseURL := c.TextbeeBaseURL
+	if baseURL == "" {
+		baseURL = "https://api.textbee.dev/api/v1"
+	}
+	endpoint := strings.TrimRight(baseURL, "/") + "/gateway/send-sms"
 	req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
 		log.Printf("booking sms notification failed: %v", err)
@@ -368,18 +378,33 @@ func (n *Notifier) sendTextbee(text string) {
 		return
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		response, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
-		var detail struct {
-			Message string `json:"message"`
+	response, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	var detail struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+		Error   string `json:"error"`
+		Data    struct {
+			SMSBatchID string `json:"smsBatchId"`
+		} `json:"data"`
+	}
+	_ = json.Unmarshal(response, &detail)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 || (!detail.Success && (detail.Error != "" || detail.Message != "")) {
+		if detail.Error != "" {
+			log.Printf("booking sms notification failed: textbee: %s", detail.Error)
+			return
 		}
-		_ = json.Unmarshal(response, &detail)
 		if detail.Message != "" {
 			log.Printf("booking sms notification failed: textbee: %s", detail.Message)
 			return
 		}
 		log.Printf("booking sms notification failed: textbee returned %s: %s", resp.Status, strings.TrimSpace(string(response)))
+		return
 	}
+	if detail.Data.SMSBatchID != "" {
+		log.Printf("booking sms notification queued: provider=textbee to=%s batch_id=%s", phone, detail.Data.SMSBatchID)
+		return
+	}
+	log.Printf("booking sms notification queued: provider=textbee to=%s", phone)
 }
 
 func bookingText(b models.Booking) string {
