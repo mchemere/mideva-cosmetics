@@ -93,7 +93,7 @@ A complete, responsive website foundation for **Gifted Hands**, a hair styling a
 
 ## Prerequisites
 - **Go** 1.22+ (recommended)
-- **PostgreSQL** 14+ (or compatible)
+- **PostgreSQL** 14+ (or compatible), or **Docker** for local testing
 - **Git**
 - A modern web browser
 
@@ -125,7 +125,8 @@ New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHO
    GMAIL_CLIENT_ID=YOUR_CLIENT_ID GMAIL_CLIENT_SECRET=YOUR_CLIENT_SECRET go run ./backend/cmd/gmailauth
    ```
    Open the printed URL, sign in as the sending Gmail account, approve access, then copy the printed `GMAIL_REFRESH_TOKEN`.
-5. In Render, set `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, and `GMAIL_REFRESH_TOKEN` (plus `NOTIFY_EMAIL` for the recipient) and redeploy. When all three Gmail variables are present, the app sends via Gmail API automatically; SMTP remains the fallback for local development.
+5. Add the printed `GMAIL_REFRESH_TOKEN` to `.env` and to Render (plus `NOTIFY_EMAIL` for the recipient), then redeploy. The quickest way to push all local notification settings is `RENDER_API_KEY=... ./scripts/render-sync-env.sh`, which also triggers a deploy. When all three Gmail variables are present, the app sends via Gmail API automatically; SMTP remains the fallback for local development.
+6. Confirm `curl -s https://YOUR-SERVICE.onrender.com/api/health` reports `email_provider: "gmail"`, `gmail_refresh_token_set: true`, and `notify_email_set: true`. If it still reports `email_provider: "smtp"`, the refresh token was not set; Render Free blocks SMTP ports, so booking emails will silently fail in the service logs.
 
 SMS supports three providers via `SMS_PROVIDER`:
 
@@ -139,18 +140,68 @@ GitHub Pages deploys only `frontend/` (currently at `https://mchemere.github.io/
 
 1. Create a PostgreSQL database (for example a free Neon database) and run `migrations/001_init.sql` then `migrations/002_seed_services.sql` in its SQL editor.
 2. Commit and push these changes first: GitHub Pages deploys only committed files, so the `apiBase` fix in `frontend/js/config.js` and `render.yaml` must be on `main`.
-3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it bookings fail with HTTP 500.
+3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it the API exits at startup.
+   - To push notification credentials from your local `.env`, run `RENDER_API_KEY=... ./scripts/render-sync-env.sh` (or `./scripts/render-sync-run.sh` and paste the key at the prompt). The script deploys automatically and deliberately leaves `DATABASE_URL`, `JWT_SECRET`, and `ALLOWED_ORIGINS` untouched so local values cannot overwrite the remote setup.
 4. Copy the deployed service URL and set `ghRemoteApiBase` in `frontend/js/config.js` to that URL with `/api` appended (for example `https://gifted-hands-api.onrender.com/api`). Push again so Pages picks it up. Alternatively set `window.GH_API_BASE` in an inline script before `js/config.js` on each page.
 5. Verify the deployment:
    ```bash
    curl -s https://YOUR-SERVICE.onrender.com/api/health
    curl -s -i -X OPTIONS -H 'Origin: https://mchemere.github.io' -H 'Access-Control-Request-Method: POST' https://YOUR-SERVICE.onrender.com/api/bookings
+   curl -s -o /dev/null -w '%{http_code}\n' https://YOUR-SERVICE.onrender.com/api/services
+   curl -s -o /dev/null -w '%{http_code}\n' -X POST -H 'Content-Type: application/json' --data '{}' https://YOUR-SERVICE.onrender.com/api/bookings
    ```
-   Health must return `{"status":"ok"}` and the preflight must include `Access-Control-Allow-Origin: https://mchemere.github.io`. `ALLOWED_ORIGINS` in `render.yaml` already contains that origin (plus localhost for development); the Pages project path is not part of an origin.
+   Health must return `{"status":"ok"}`, the preflight must include `Access-Control-Allow-Origin: https://mchemere.github.io`, `/api/services` must return `200`, and an empty booking POST must return `400`. `ALLOWED_ORIGINS` in `render.yaml` already contains that origin (plus localhost for development); the Pages project path is not part of an origin.
 6. Submit a test booking on the live site, then confirm it appears in the admin dashboard and that the notification logs show delivery.
 7. Optional: ping `/api/health` every 10 minutes with a free uptime monitor so the free Render instance doesn't sleep before a booking.
 
 > **Security:** Never commit real `.env` secrets. Database credentials are server-side only and never exposed to frontend code.
+
+## Local Testing with Docker
+
+`Dockerfile.db` builds a PostgreSQL 16 container that applies both migration files automatically the first time it starts with a fresh data volume. The defaults match `.env.example` (`postgres` / `postgres` / `gifted_hands` on port `5432`).
+
+1. Build the image and start the database:
+   ```bash
+   docker build -t mideva-cosmetics-db -f Dockerfile.db .
+   docker volume create mideva-cosmetics-db-data
+   docker run --name mideva-cosmetics-db \
+     -v mideva-cosmetics-db-data:/var/lib/postgresql/data \
+     -p 5432:5432 \
+     -d mideva-cosmetics-db
+   ```
+
+2. Wait for PostgreSQL to finish initialization:
+   ```bash
+   until [ "$(docker inspect -f '{{.State.Health.Status}}' mideva-cosmetics-db)" = "healthy" ]; do sleep 1; done
+   ```
+
+3. If you have not done so already, create `.env` from the example. The provided `DATABASE_URL` matches the container:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Create an admin user and start the backend in another terminal:
+   ```bash
+   go run ./backend/cmd/createadmin -username admin -password "StrongPasswordHere" -name "Gifted Hands Admin"
+   go run ./backend/cmd/server
+   ```
+
+5. Open `http://localhost:8080/` and check `http://localhost:8080/api/health`.
+
+Useful commands:
+```bash
+docker logs mideva-cosmetics-db
+docker stop mideva-cosmetics-db
+docker start mideva-cosmetics-db
+```
+
+To delete the local database and re-run migrations from scratch (destroys all local data):
+```bash
+docker rm -f mideva-cosmetics-db
+docker volume rm mideva-cosmetics-db-data
+```
+
+Migrations only run when the data volume is empty. For an existing volume, apply SQL manually as described below. The container uses development credentials and is intended for local testing only.
 
 ## Database Setup
 

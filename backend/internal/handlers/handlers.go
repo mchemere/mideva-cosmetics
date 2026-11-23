@@ -35,6 +35,7 @@ func (a *API) Health(w http.ResponseWriter, r *http.Request) {
 		"gmail_refresh_token_set": false,
 		"smtp_set":                false,
 		"sms_provider":            "disabled",
+		"notify_email_set":        false,
 		"notify_phone_set":        false,
 		"textbee_api_key_set":     false,
 		"textbee_device_id_set":   false,
@@ -45,6 +46,7 @@ func (a *API) Health(w http.ResponseWriter, r *http.Request) {
 		response["gmail_refresh_token_set"] = a.Cfg.GmailRefreshToken != ""
 		response["smtp_set"] = a.Cfg.SMTPUser != "" && a.Cfg.SMTPPass != ""
 		response["sms_provider"] = a.Cfg.SMSProvider
+		response["notify_email_set"] = a.Cfg.NotifyEmail != ""
 		response["notify_phone_set"] = a.Cfg.NotifyPhone != ""
 		response["textbee_api_key_set"] = a.Cfg.TextbeeAPIKey != ""
 		response["textbee_device_id_set"] = a.Cfg.TextbeeDeviceID != ""

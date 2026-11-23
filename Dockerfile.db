@@ -1,0 +1,14 @@
+FROM postgres:16-alpine
+
+ENV POSTGRES_DB=gifted_hands \
+    POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=postgres
+
+COPY migrations/ /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
+
+VOLUME /var/lib/postgresql/data
+
+HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=20 \
+    CMD pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
