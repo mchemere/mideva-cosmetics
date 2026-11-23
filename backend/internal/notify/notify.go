@@ -134,12 +134,12 @@ func (n *Notifier) sendGmail(messageID string, msg []byte) error {
 		return err
 	}
 	log.Printf("gmail phase=token ok")
-	payload, err := json.Marshal(map[string]string{"raw": base64.RawURLEncoding.EncodeToString(msg)})
+	payload, err := json.Marshal(map[string]string{"raw": base64.URLEncoding.EncodeToString(msg)})
 	if err != nil {
 		log.Printf("gmail phase=encode failed: %v", err)
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost, "https://gmail.googleapis.com/gmail/v1/users/me/messages", bytes.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, "https://gmail.googleapis.com/gmail/v1/users/me/messages/send", bytes.NewReader(payload))
 	if err != nil {
 		log.Printf("gmail phase=request failed: %v", err)
 		return err
