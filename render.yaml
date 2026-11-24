@@ -11,7 +11,7 @@ services:
       - key: FRONTEND_DIR
         value: ./frontend
       - key: ALLOWED_ORIGINS
-        value: https://mchemere.github.io,http://localhost:8080,http://127.0.0.1:8080
+        value: https://mchemere.github.io,https://mideva-cosmetics.chemeresmiriam.workers.dev,http://localhost:8080,http://127.0.0.1:8080
       - key: ADMIN_SESSION_HOURS
         value: "24"
       - key: DATABASE_URL

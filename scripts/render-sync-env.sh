@@ -4,7 +4,7 @@ set -euo pipefail
 service_id="${RENDER_SERVICE_ID:-srv-dbul1gmk1f9s73ajp5q0}"
 api_key="${RENDER_API_KEY:?set RENDER_API_KEY and rerun}"
 deploy_mode="${DEPLOY_MODE:-deploy_only}"
-health_url="${HEALTH_URL:-https://gifted-hands-api.onrender.com/api/health}"
+health_url="${HEALTH_URL:-https://mideva-cosmetics.chemeresmiriam.workers.dev/api/health}"
 
 if [[ -f .env ]]; then
   while IFS= read -r line || [[ -n "$line" ]]; do

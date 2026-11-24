@@ -1,398 +1,165 @@
-# Gifted Hands – Professional Hair Salon Website
+# MIDEVA COSMETICS – LUXURY BEAUTY E-COMMERCE WEBSITE
 
-A complete, responsive website foundation for **Gifted Hands**, a hair styling and braiding business. The project includes a public-facing website, a booking/contact request flow, a Go REST API backend, PostgreSQL persistence, and a secure administrator dashboard.
+An elegant, modern, high-performance e-commerce frontend for **Mideva Cosmetics**, an international beauty brand crafted to celebrate natural radiance, skin confidence, and luxurious self-care through high-performance botanical essentials.
 
-> **Business details used (as provided):**  
-> - Business name: **Gifted Hands**  
-> - Services: Knotless braids, Normal braids, Twist-outs, Ghanaian hairstyles  
-> - Phone: **0712117024** (WhatsApp links use Kenya international format: `254712117024`)  
-> 
-> Unknown details (prices, durations, exact location, social URLs, reviews, real photos) are intentionally left as **configurable placeholders** and can be updated without changing core application logic.
+---
 
-## Features
+## 🌟 Brand Identity & Visual Aesthetic
 
-### Public website (HTML/CSS/Vanilla JS)
-- Responsive, mobile-first design with pink/white/neutral salon aesthetic
-- Pages: **Home, About, Services, Gallery, Booking, Contact**
-- Hero section with full-cover background image and prominent booking CTAs
-- Services loaded from API and displayed with name, description, image, price placeholder, duration placeholder, and booking action
-- Gallery with category filters and responsive image grid
-- WhatsApp contact/booking inquiry buttons across the site
-- Functional booking request form with client-side validation and API submission
-- Functional contact form with validation and API submission
-- Configurable placeholders for location, social links, testimonials, and images
+- **Brand Name:** Mideva Cosmetics
+- **Tagline:** *"Discover Your Beauty. Embrace Your Glow."*
+- **Supporting Narrative:** *"Enhance your natural beauty with carefully selected beauty and skincare essentials formulated to nourish, protect, and illuminate."*
+- **Aesthetic Direction:** Luxurious, feminine, modern, and warm. Designed to stand alongside international luxury beauty houses while proudly honoring East African botanicals (Baobab, Nilotica Shea, Marula, Kenyan Highland Coffee).
+- **Color Palette:**
+  - **Champagne Gold:** `#C5A059` / `#E5C378` / `#A7823E` (Accents, badges, CTAs)
+  - **Soft Blush Pink:** `#FCF4F5` / `#F8E3E7` / `#F3CAD2` (Section backgrounds, pills)
+  - **Warm Ivory / Cream:** `#FFFDF8` / `#FAF6F0` (Card and background surfaces)
+  - **Warm Beige:** `#F4ECE3` / `#E6D8CA` (Borders, subtle cards)
+  - **Dark Espresso Brown:** `#2B1E1A` / `#4A3A35` (Readable text, luxury dark headers)
+- **Typography:**
+  - Headings: `'Playfair Display', Georgia, serif`
+  - Body & UI: `'Plus Jakarta Sans', system-ui, sans-serif`
 
-### Backend (Go, REST API)
-- Clean, organized Go backend (`cmd`, `internal` packages)
-- REST endpoints for bookings, services, and inquiries
-- Administrator authentication with JWT
-- Password hashing with bcrypt
-- Protected admin routes
-- PostgreSQL persistence with parameterized SQL queries
-- Input validation, proper HTTP status codes, error handling, and CORS configuration
-- Environment-based configuration (`.env` supported)
+---
 
-### Admin dashboard
-- Secure admin login (no hardcoded production credentials)
-- View customer bookings and contact details
-- Approve/reject/update booking statuses (requests are **not** auto-confirmed)
-- Delete bookings
-- Manage hairstyle services (create, update, delete, activate/deactivate)
-- View customer inquiries
+## 🚀 Technology Stack
 
-### Database (PostgreSQL)
-- Tables: `administrators`, `services`, `bookings`, `inquiries`
-- Appropriate keys, constraints, timestamps, indexes, and enum status for bookings
-- Migration scripts in `migrations/`
+- **HTML5:** Clean, semantic, accessible markup with OpenGraph and meta descriptions.
+- **CSS3:** Custom responsive design system, CSS variables, flexbox, CSS grid, glassmorphic headers (`backdrop-filter`), micro-animations, and custom scrollbars.
+- **Vanilla JavaScript (ES6+):** Modular, framework-free architecture with state persistence using `localStorage`. Ready for REST / GraphQL backend integration.
+- **No external frameworks:** Zero React, Angular, Vue, or TypeScript dependencies.
 
-## Technologies Used
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Backend:** Go (Golang), `net/http` (Go 1.22+ routing patterns), JWT, bcrypt
-- **Database:** PostgreSQL
-- **API:** REST (JSON over HTTP)
-- **Version control:** Git / GitHub
+---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
-.
-├── backend/
-│   ├── cmd/
-│   │   ├── server/              # API + static frontend server entrypoint
-│   │   └── createadmin/         # CLI tool to create admin users securely
-│   └── internal/
-│       ├── auth/                # Password hashing and JWT helpers
-│       ├── config/              # Environment/config loading
-│       ├── database/            # PostgreSQL connection management
-│       ├── handlers/            # HTTP handlers (public + admin)
-│       ├── middleware/          # CORS and admin auth middleware
-│       ├── models/              # Data models
-│       ├── repository/          # Database access (parameterized queries)
-│       └── util/                # Validation and response helpers
-├── frontend/
-│   ├── admin/                   # Admin login and dashboard pages
-│   ├── assets/images/           # Placeholder SVG images (replace with real photos)
-│   ├── css/                     # Global styles
-│   ├── js/                      # Frontend logic (config, API calls, forms, admin)
-│   ├── index.html               # Home
-│   ├── about.html               # About
-│   ├── services.html            # Services
-│   ├── gallery.html             # Gallery
-│   ├── booking.html             # Booking request form
-│   └── contact.html             # Contact page/form
-├── migrations/
-│   ├── 001_init.sql             # Schema, constraints, triggers
-│   └── 002_seed_services.sql    # Default Gifted Hands services (placeholders)
-├── docs/                        # Additional documentation (optional)
-├── scripts/                     # Helper scripts (optional)
-├── .env.example                 # Example environment configuration (no secrets)
-├── .gitignore
-├── go.mod
-└── README.md
+mideva-cosmetics/
+├── index.html                     # Flagship Homepage
+├── css/
+│   ├── style.css                  # Core luxury design system, typography & components
+│   └── responsive.css             # Breakpoint adaptations (1200px, 992px, 768px, 576px, 400px)
+├── js/
+│   ├── products.js                # 17 rich cosmetic products catalog & search helper
+│   ├── cart.js                    # Shopping bag state, drawer, coupons & checkout modal
+│   ├── wishlist.js                # Wishlist state, badge sync & move-to-cart engine
+│   └── main.js                    # Global header, search modal, quick view, auth & forms
+├── pages/
+│   ├── shop.html                  # Catalog with category filters, price slider & sorting
+│   ├── product-details.html       # Dynamic product view (?id=...) with gallery & tabs
+│   ├── cart.html                  # Full cart table, shipping calculator & checkout modal
+│   ├── wishlist.html              # Saved items grid with transfer to bag
+│   ├── about.html                 # Brand story, mission, founder letter & commitments
+│   ├── contact.html               # Interactive inquiry form, boutique details & FAQs
+│   ├── login.html                 # Luxury sign in card with session persistence
+│   └── register.html              # Account creation with Glow Club rewards benefits
+└── assets/
+    └── images/                    # Curated high-res beauty photography, logos & SVGs
 ```
 
-## Prerequisites
-- **Go** 1.22+ (recommended)
-- **PostgreSQL** 14+ (or compatible), or **Docker** for local testing
-- **Git**
-- A modern web browser
+---
 
-## Environment Configuration
+## 🛍️ Product Catalog & Categories
 
-1. Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
-2. Edit `.env` with your values:
-   - `PORT` – server port (default `8080`)
-   - `FRONTEND_DIR` – path to frontend files (default `./frontend`)
-   - `DATABASE_URL` – PostgreSQL connection string (**required**)
-   - `ALLOWED_ORIGINS` – comma-separated origins for CORS
-   - `JWT_SECRET` – long random secret for admin tokens (**change in production**)
-   - `ADMIN_SESSION_HOURS` – admin token/session lifetime
+The website comes with 17 curated beauty products across 6 categories:
 
-### Booking notifications
+1. **Skincare:**
+   - Luminous Glow Vitamin C Serum (15% Ethyl Ascorbic Acid & Baobab)
+   - Hydra-Plump Hyaluronic Acid Moisturizer (72-hour moisture surge)
+   - Rose Petal Hydrating Mist & Toner (Steam-distilled Damask rose)
+   - Gentle Radiance Clarifying Gel Cleanser (Papaya enzymes & green tea)
+2. **Makeup:**
+   - Velvet Satin Matte Lipstick – Kenya Sunset (Warm terracotta nude)
+   - High-Shine Glossy Lip Nectar – Golden Honey (Glass-finish lip oil)
+   - Flawless Radiance Weightless Foundation (SPF 25, 24 shades)
+   - Golden Hour Champagne Highlighter (Baked micro-pearl illuminating powder)
+3. **Body Care:**
+   - Golden Radiance Shimmering Body Elixir (Marula & Argan dry oil)
+   - Whipped Shea & Cocoa Deep Nourishing Body Butter (Nilotica shea)
+   - Exfoliating Brown Sugar & Coffee Body Polish (Organic Kenyan Arabica)
+4. **Hair Care:**
+   - Botanical Crown Scalp & Hair Growth Elixir (Rosemary, Biotin & Castor oil)
+   - Deep Moisture Silk Amino Acid Repair Mask (Keratin and Baobab protein)
+5. **Fragrances:**
+   - Mideva Éclat de Rose Eau de Parfum (50ml) (Bulgarian rose, amber, vanilla)
+   - Amber Santal & White Jasmine Body Mist (150ml) (Sandalwood & floral mist)
+6. **Beauty Accessories:**
+   - Sculpting Rose Quartz Face Roller & Gua Sha Set (100% natural crystal)
+   - Velvet Plush Powder Puff & Blending Sponge Duo (Airbrushed finish)
 
-New bookings trigger an email and an SMS alert to `NOTIFY_EMAIL` and `NOTIFY_PHONE` (leave either blank to disable that channel).
+---
 
-**Email on Render Free:** Render blocks outbound SMTP ports `25`, `465`, and `587` on Free services, so Gmail SMTP times out there. Use the Gmail API instead (HTTPS, port `443`):
+## ⚡ Interactive Frontend Features
 
-1. In Google Cloud Console, create/select a project and enable the **Gmail API**.
-2. Configure the OAuth consent screen as **External**, add the sending Gmail address as a test user, and add scope `https://www.googleapis.com/auth/gmail.send`.
-3. Create an **OAuth client ID** of type **Web application** with authorized redirect URI `http://localhost:8080/oauth2/callback`.
-4. Generate a refresh token locally:
-   ```bash
-   GMAIL_CLIENT_ID=YOUR_CLIENT_ID GMAIL_CLIENT_SECRET=YOUR_CLIENT_SECRET go run ./backend/cmd/gmailauth
-   ```
-   Open the printed URL, sign in as the sending Gmail account, approve access, then copy the printed `GMAIL_REFRESH_TOKEN`.
-5. Add the printed `GMAIL_REFRESH_TOKEN` to `.env` and to Render (plus `NOTIFY_EMAIL` for the recipient), then redeploy. The quickest way to push all local notification settings is `RENDER_API_KEY=... ./scripts/render-sync-env.sh`, which also triggers a deploy. When all three Gmail variables are present, the app sends via Gmail API automatically; SMTP remains the fallback for local development.
-6. Confirm `curl -s https://YOUR-SERVICE.onrender.com/api/health` reports `email_provider: "gmail"`, `gmail_refresh_token_set: true`, and `notify_email_set: true`. If it still reports `email_provider: "smtp"`, the refresh token was not set; Render Free blocks SMTP ports, so booking emails will silently fail in the service logs.
+- **Dynamic Cart Management (`js/cart.js`):**
+  - Add to bag from any product card, quick view modal, or detail page.
+  - Slide-out mini-cart drawer (`#cart-drawer`) with real-time subtotal.
+  - Increment / decrement quantity controls.
+  - Remove items from cart.
+  - Coupon discount engine supporting codes:
+    - `GLOW10` (10% off)
+    - `MIDEVA20` (20% off)
+    - `WELCOME15` (15% off)
+  - Delivery calculation: Free delivery in Nairobi for orders over KSh 5,000; KSh 300 flat rate otherwise.
+  - Simulated express checkout modal with M-Pesa, Card, and Cash on Delivery options.
+  - Persistent state in browser `localStorage`.
+- **Dynamic Wishlist Management (`js/wishlist.js`):**
+  - Heart toggle buttons across all product cards with active state tracking.
+  - Reactive navbar wishlist counter badge.
+  - "Move to Bag" action transferring saved items straight to cart.
+  - Persistent state in browser `localStorage`.
+- **Live Search & Autocomplete Modal (`js/main.js`):**
+  - Clickable search icon opening animated overlay.
+  - Real-time search by product title, category, or description.
+- **Quick View Modal (`openQuickView(id)`):**
+  - Preview any product without navigating away.
+  - View image, price, rating, highlights, quantity picker, and direct "Add to Bag".
+- **Dynamic Product Details Page (`product-details.html?id=...`):**
+  - Automatically loads full details and images from catalog based on URL ID.
+  - Interactive tabs: *Key Ingredients*, *How to Use Ritual*, and *Customer Reviews*.
+  - Related products recommendation slider.
+- **Shop Catalog Filtering & Sorting (`shop.html`):**
+  - Filter by Category (Skincare, Makeup, Body Care, Hair Care, Fragrances, Accessories).
+  - Price range slider up to KSh 8,000 with real-time count.
+  - Sort by: Featured, Price (Low to High), Price (High to Low), Rating, Name.
+- **Toast Notification Engine:**
+  - Non-intrusive floating feedback messages for cart actions, wishlist toggles, and form submissions.
+- **Authentication Simulation (`login.html` & `register.html`):**
+  - Form validation with localStorage session management.
+  - Updates navigation account icon to display user's initial.
+- **Interactive Forms:**
+  - Newsletter subscription with instant voucher generation.
+  - Contact Us form with validation and confirmation feedback.
 
-SMS supports three providers via `SMS_PROVIDER`:
+---
 
-- `africastalking` (default) – set `AT_USERNAME`, `AT_API_KEY`, optional `AT_SENDER`. Use a live app username; `sandbox` does not deliver real SMS.
-- `twilio` – set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`.
-- `textbee` – free tier (300 SMS/month, 50/day) using an Android phone and SIM you own as the gateway. Set `TEXTBEE_API_KEY` (from the textbee dashboard), optionally `TEXTBEE_DEVICE_ID` to pick a phone, and link the phone in the textbee app. The phone must stay powered and connected. `TEXTBEE_BASE_URL` defaults to `https://api.textbee.dev/api/v1`.
+## 💻 How to Run Locally
 
-### Remote API for GitHub Pages
+You can serve Mideva Cosmetics using any static file server:
 
-GitHub Pages deploys only `frontend/` (currently at `https://mchemere.github.io/mideva-cosmetics/`), so it cannot run the Go API or send notifications. `render.yaml` defines a free Render web service, but the PostgreSQL database must be created separately:
-
-1. Create a PostgreSQL database (for example a free Neon database) and run `migrations/001_init.sql` then `migrations/002_seed_services.sql` in its SQL editor.
-2. Commit and push these changes first: GitHub Pages deploys only committed files, so the `apiBase` fix in `frontend/js/config.js` and `render.yaml` must be on `main`.
-3. In Render, **New → Blueprint**, select this repo. Fill in the prompted values (`DATABASE_URL`, `NOTIFY_EMAIL`, `NOTIFY_PHONE`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `TEXTBEE_API_KEY`, `TEXTBEE_DEVICE_ID`). `DATABASE_URL` is required; without it the API exits at startup.
-   - To push notification credentials from your local `.env`, run `RENDER_API_KEY=... ./scripts/render-sync-env.sh` (or `./scripts/render-sync-run.sh` and paste the key at the prompt). The script deploys automatically and deliberately leaves `DATABASE_URL`, `JWT_SECRET`, and `ALLOWED_ORIGINS` untouched so local values cannot overwrite the remote setup.
-4. Copy the deployed service URL and set `ghRemoteApiBase` in `frontend/js/config.js` to that URL with `/api` appended (for example `https://gifted-hands-api.onrender.com/api`). Push again so Pages picks it up. Alternatively set `window.GH_API_BASE` in an inline script before `js/config.js` on each page.
-5. Verify the deployment:
-   ```bash
-   curl -s https://YOUR-SERVICE.onrender.com/api/health
-   curl -s -i -X OPTIONS -H 'Origin: https://mchemere.github.io' -H 'Access-Control-Request-Method: POST' https://YOUR-SERVICE.onrender.com/api/bookings
-   curl -s -o /dev/null -w '%{http_code}\n' https://YOUR-SERVICE.onrender.com/api/services
-   curl -s -o /dev/null -w '%{http_code}\n' -X POST -H 'Content-Type: application/json' --data '{}' https://YOUR-SERVICE.onrender.com/api/bookings
-   ```
-   Health must return `{"status":"ok"}`, the preflight must include `Access-Control-Allow-Origin: https://mchemere.github.io`, `/api/services` must return `200`, and an empty booking POST must return `400`. `ALLOWED_ORIGINS` in `render.yaml` already contains that origin (plus localhost for development); the Pages project path is not part of an origin.
-6. Submit a test booking on the live site, then confirm it appears in the admin dashboard and that the notification logs show delivery.
-7. Optional: ping `/api/health` every 10 minutes with a free uptime monitor so the free Render instance doesn't sleep before a booking.
-
-> **Security:** Never commit real `.env` secrets. Database credentials are server-side only and never exposed to frontend code.
-
-## Local Testing with Docker
-
-`Dockerfile.db` builds a PostgreSQL 16 container that applies both migration files automatically the first time it starts with a fresh data volume. The defaults match `.env.example` (`postgres` / `postgres` / `gifted_hands` on port `5432`).
-
-1. Build the image and start the database:
-   ```bash
-   docker build -t mideva-cosmetics-db -f Dockerfile.db .
-   docker volume create mideva-cosmetics-db-data
-   docker run --name mideva-cosmetics-db \
-     -v mideva-cosmetics-db-data:/var/lib/postgresql/data \
-     -p 5432:5432 \
-     -d mideva-cosmetics-db
-   ```
-
-2. Wait for PostgreSQL to finish initialization:
-   ```bash
-   until [ "$(docker inspect -f '{{.State.Health.Status}}' mideva-cosmetics-db)" = "healthy" ]; do sleep 1; done
-   ```
-
-3. If you have not done so already, create `.env` from the example. The provided `DATABASE_URL` matches the container:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Create an admin user and start the backend in another terminal:
-   ```bash
-   go run ./backend/cmd/createadmin -username admin -password "StrongPasswordHere" -name "Gifted Hands Admin"
-   go run ./backend/cmd/server
-   ```
-
-5. Open `http://localhost:8080/` and check `http://localhost:8080/api/health`.
-
-Useful commands:
+### Option A: Python 3
 ```bash
-docker logs mideva-cosmetics-db
-docker stop mideva-cosmetics-db
-docker start mideva-cosmetics-db
+python3 -m http.server 8080
 ```
+Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-To delete the local database and re-run migrations from scratch (destroys all local data):
+### Option B: Node.js (npx serve)
 ```bash
-docker rm -f mideva-cosmetics-db
-docker volume rm mideva-cosmetics-db-data
+npx serve .
 ```
 
-Migrations only run when the data volume is empty. For an existing volume, apply SQL manually as described below. The container uses development credentials and is intended for local testing only.
+### Option C: VS Code Live Server
+Right-click `index.html` and choose **"Open with Live Server"**.
 
-## Database Setup
+---
 
-1. Create a PostgreSQL database (example):
-   ```bash
-   createdb gifted_hands
-   ```
-   Or via `psql`:
-   ```sql
-   CREATE DATABASE gifted_hands;
-   ```
+## 🔮 Backend Integration Roadmap
 
-2. Apply migrations in order:
-   ```bash
-   psql "$DATABASE_URL" -f migrations/001_init.sql
-   psql "$DATABASE_URL" -f migrations/002_seed_services.sql
-   ```
-   Replace `$DATABASE_URL` with your actual connection string if not exported in your shell.
+The frontend has been constructed with clear interfaces for REST API integration:
+- Replace `MIDEVA_PRODUCTS` in `js/products.js` with `fetch('/api/products')`.
+- Replace `localStorage` cart mutations in `js/cart.js` with `POST /api/cart` and `POST /api/checkout`.
+- Replace auth helpers in `js/main.js` with standard JWT bearer token authentication.
 
-`002_seed_services.sql` inserts the four offered services with **price/duration placeholders** and placeholder image paths. You can update them later via the admin dashboard, SQL, or by replacing records.
+---
 
-## Install Backend Dependencies
-
-From the project root:
-```bash
-go mod tidy
-```
-This downloads required Go modules and generates/updates `go.sum`.
-
-## Create an Administrator Account (Secure)
-
-Do **not** hardcode admin credentials. Create an admin using the provided CLI tool:
-
-```bash
-# Ensure DATABASE_URL and a strong password are set (via env or flags)
-export DATABASE_URL="postgres://postgres:postgres@localhost:5432/gifted_hands?sslmode=disable"
-
-go run ./backend/cmd/createadmin -username admin -password "StrongPasswordHere" -name "Gifted Hands Admin"
-```
-
-You can also provide `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_FULL_NAME` via environment variables.
-
-## How to Run the Backend
-
-Start the Go server (serves API and frontend static files):
-```bash
-# from project root, with .env configured
-go run ./backend/cmd/server
-```
-
-The application will be available at: **http://localhost:8080** (or your configured `PORT`).
-
-- Public site: `http://localhost:8080/`
-- Admin login: `http://localhost:8080/admin/login.html`
-- Health check: `http://localhost:8080/api/health`
-
-## How to Run the Frontend
-
-The frontend is static (HTML/CSS/JS) and is **served by the Go backend** in this project for simple same-origin API integration.
-
-For UI-only development, you may open files with a static server, but API calls expect the backend at `/api` (same origin). Recommended: run the Go backend as above.
-
-## API Documentation
-
-Base path: `/api`
-
-### Public endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health` | Health check |
-| GET | `/api/services` | Retrieve active services |
-| POST | `/api/bookings` | Create a booking request (saved as `pending`, not auto-confirmed) |
-| POST | `/api/inquiries` | Submit a customer inquiry/contact message |
-
-#### `POST /api/bookings` body
-```json
-{
-  "customer_name": "Jane Doe",
-  "phone_number": "0712345678",
-  "email": "optional@example.com",
-  "service_id": 1,
-  "service_name": "Knotless Braids",
-  "preferred_date": "2026-12-01",
-  "preferred_time": "14:00",
-  "message": "Optional notes"
-}
-```
-Required: `customer_name`, `phone_number`, `service_name`, `preferred_date` (YYYY-MM-DD), `preferred_time`. `email` is optional but validated if provided.
-
-#### `POST /api/inquiries` body
-```json
-{
-  "name": "Jane Doe",
-  "phone_number": "0712345678",
-  "email": "optional@example.com",
-  "subject": "Style inquiry",
-  "message": "Hello, I would like to know more..."
-}
-```
-Required: `name`, `message`.
-
-### Admin endpoints (require `Authorization: Bearer <token>`)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/admin/login` | Authenticate admin, returns JWT token |
-| GET | `/api/admin/bookings` | List all bookings |
-| PATCH | `/api/admin/bookings/{id}` | Update booking status/notes (`pending`, `approved`, `rejected`, `completed`, `cancelled`) |
-| DELETE | `/api/admin/bookings/{id}` | Delete a booking |
-| GET | `/api/admin/inquiries` | List customer inquiries |
-| GET | `/api/admin/services` | List all services (including inactive) |
-| POST | `/api/admin/services` | Create a service |
-| PUT | `/api/admin/services/{id}` | Update a service |
-| DELETE | `/api/admin/services/{id}` | Delete a service |
-
-#### `POST /api/admin/login` body
-```json
-{ "username": "admin", "password": "your-password" }
-```
-
-#### `PATCH /api/admin/bookings/{id}` body
-```json
-{ "status": "approved", "admin_notes": "Optional notes" }
-```
-
-## WhatsApp Integration
-- WhatsApp buttons are available throughout the site and open `https://wa.me/254712117024` (Kenya international format) with a prefilled message.
-- The booking page can compose a booking inquiry message and send it via WhatsApp.
-- Configure number/display in `frontend/js/config.js` (`phoneDisplay`, `whatsappNumber`).
-
-## Configuration & Customization
-- **Phone/WhatsApp/location/socials:** `frontend/js/config.js`
-- **Services, prices, durations, images:** managed via admin dashboard or database (`services` table)
-- **Images:** replace placeholder SVGs in `frontend/assets/images/` with real photographs (keep filenames/paths or update `image_path` values accordingly)
-- **Testimonials/location/address:** placeholders in HTML/config for easy editing once real information is available
-
-## Testing
-
-### Backend
-```bash
-# format check
-gofmt -l backend
-
-# build
-go build ./backend/cmd/server ./backend/cmd/createadmin
-
-# run tests (add tests as the project evolves)
-go test ./...
-```
-
-### Manual verification checklist
-- Website navigation across all pages (desktop and mobile menu)
-- Booking form validation (required fields, phone/email format, date not in past) and successful API submission
-- Contact form validation and submission
-- Services load from API on Home/Services pages
-- Gallery category filtering and responsive layout
-- WhatsApp buttons open correct `wa.me` link with prefilled message
-- Admin login, token-protected dashboard access
-- Booking approval/rejection/status updates and deletion
-- Service create/update/delete from admin dashboard
-- Database records created/updated correctly
-
-### API smoke tests (examples)
-```bash
-# health
-curl -s http://localhost:8080/api/health
-
-# list services
-curl -s http://localhost:8080/api/services
-
-# create booking request
-curl -s -X POST http://localhost:8080/api/bookings \
-  -H "Content-Type: application/json" \
-  -d '{"customer_name":"Test User","phone_number":"0712117024","service_name":"Knotless Braids","preferred_date":"2026-12-01","preferred_time":"10:00"}'
-```
-
-## Deployment Notes
-- Set strong production values for `JWT_SECRET` and `DATABASE_URL` via environment variables or a secret manager.
-- Run migrations against the production PostgreSQL database.
-- Create admin users with `backend/cmd/createadmin` (do not seed hardcoded credentials).
-- Build a production binary:
-  ```bash
-  go build -o bin/gifted-hands-server ./backend/cmd/server
-  ./bin/gifted-hands-server
-  ```
-- Serve behind HTTPS (reverse proxy like Nginx/Caddy) and configure `ALLOWED_ORIGINS` appropriately.
-- Ensure PostgreSQL backups, logging/monitoring, and least-privilege DB credentials.
-- Replace placeholder images/content with real business assets when available.
-
-## Notes
-- Booking requests are stored with status `pending` and require manual approval by the administrator.
-- No business information, prices, reviews, or addresses were invented; placeholders are provided for easy configuration.
-- Frontend avoids frameworks as requested and uses clean, maintainable vanilla HTML/CSS/JS.
+© 2026 Mideva Cosmetics Ltd. All rights reserved.

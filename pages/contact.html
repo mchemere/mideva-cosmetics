@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Mideva Cosmetics</title>
+  <meta name="description" content="Get in touch with the Mideva Cosmetics beauty concierge in Westlands, Nairobi. Order inquiries, skincare advice, and customer support.">
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <span>Free delivery across Nairobi on orders over KSh 5,000 <span class="sparkle">✨</span> Use code <strong>GLOW10</strong> for 10% off</span>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <button class="mobile-menu-btn" aria-label="Open mobile navigation">
+        <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2" fill="none">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="../index.html" class="brand-logo" aria-label="Mideva Cosmetics Home">
+        <img src="../assets/images/logo.svg" alt="Mideva Cosmetics" width="220" height="50">
+      </a>
+
+      <nav class="nav-menu">
+        <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <div class="nav-item-dropdown">
+          <a href="shop.html" class="nav-link dropdown-toggle">
+            Categories <span class="dropdown-chevron">▼</span>
+          </a>
+          <div class="dropdown-menu">
+            <a href="shop.html?category=skincare" class="dropdown-item">Skincare <small>→</small></a>
+            <a href="shop.html?category=makeup" class="dropdown-item">Makeup <small>→</small></a>
+            <a href="shop.html?category=bodycare" class="dropdown-item">Body Care <small>→</small></a>
+            <a href="shop.html?category=haircare" class="dropdown-item">Hair Care <small>→</small></a>
+            <a href="shop.html?category=fragrances" class="dropdown-item">Fragrances <small>→</small></a>
+            <a href="shop.html?category=accessories" class="dropdown-item">Beauty Accessories <small>→</small></a>
+          </div>
+        </div>
+        <a href="about.html" class="nav-link">About Us</a>
+        <a href="contact.html" class="nav-link active">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="nav-action-btn btn-open-search" title="Search Products" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <a href="wishlist.html" class="nav-action-btn" title="View Wishlist" aria-label="Wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <span class="action-badge wishlist-badge" style="display: none;">0</span>
+        </a>
+        <button class="nav-action-btn" onclick="MidevaCart.openDrawer()" title="View Cart" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="action-badge cart-badge" style="display: none;">0</span>
+        </button>
+        <a href="login.html" class="nav-action-btn user-account-link" title="My Account" aria-label="Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu-overlay"></div>
+
+  <!-- Page Banner -->
+  <div class="page-header-banner">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <a href="../index.html">Home</a>
+        <span class="divider">/</span>
+        <span style="color: var(--color-text-dark); font-weight: 600;">Contact Us</span>
+      </nav>
+      <h1 style="font-size: 2.6rem; margin-bottom: 0.5rem;">We’re Here for Your Glow</h1>
+      <p style="color: var(--color-text-muted); max-width: 540px; margin: 0 auto;">
+        Have a question about your order, our ingredients, or need personalized skincare consultation? Reach out today.
+      </p>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 4rem; align-items: start;">
+        
+        <!-- Interactive Contact Form -->
+        <div style="background: #fff; padding: 2.8rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+          <span class="section-subtitle-tag">Send a Message</span>
+          <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Speak with Our Beauty Team</h2>
+
+          <form id="mideva-contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="contact-name">Your Full Name *</label>
+                <input type="text" id="contact-name" class="form-control" placeholder="e.g. Maureen Akinyi" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-email">Email Address *</label>
+                <input type="email" id="contact-email" class="form-control" placeholder="maureen@example.com" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="contact-phone">Phone Number (Call / WhatsApp)</label>
+                <input type="tel" id="contact-phone" class="form-control" placeholder="07XX XXX XXX">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-order-id">Order Number (If applicable)</label>
+                <input type="text" id="contact-order-id" class="form-control" placeholder="e.g. MC-104928">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="contact-subject">Inquiry Subject</label>
+              <select id="contact-subject" class="form-control" style="cursor: pointer;">
+                <option value="routine">Personalized Skincare Consultation</option>
+                <option value="order">Order Tracking & Dispatch</option>
+                <option value="returns">Product Returns or Exchanges</option>
+                <option value="wholesale">Wholesale & Stockist Inquiries</option>
+                <option value="other">Other Inquiries</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="contact-message">Your Message *</label>
+              <textarea id="contact-message" rows="5" class="form-control" placeholder="Tell us about your skin goals, questions or order details..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+              Send Message
+            </button>
+          </form>
+        </div>
+
+        <!-- Boutique Information & Direct Channels -->
+        <div>
+          <div style="background: var(--color-cream); padding: 2.5rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border); margin-bottom: 2rem;">
+            <span class="section-subtitle-tag">Nairobi Flagship</span>
+            <h3 style="font-size: 1.4rem; margin-bottom: 1.2rem;">Visit Our Beauty Boutique</h3>
+
+            <div style="display: flex; flex-direction: column; gap: 1.2rem; font-size: 0.95rem; color: var(--color-text-body);">
+              <div style="display: flex; gap: 1rem;">
+                <span style="font-size: 1.3rem; color: var(--color-primary-dark);">📍</span>
+                <div>
+                  <strong>Store Location:</strong><br>
+                  The Promenade, 4th Floor<br>
+                  General Mathenge Drive, Westlands<br>
+                  Nairobi, Kenya
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <span style="font-size: 1.3rem; color: var(--color-primary-dark);">📞</span>
+                <div>
+                  <strong>Phone / WhatsApp Concierge:</strong><br>
+                  <a href="tel:+254712345678" style="color: var(--color-primary-dark); font-weight: 600;">+254 712 345 678</a><br>
+                  <small style="color: var(--color-text-muted);">Direct consultation available 7 days a week.</small>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <span style="font-size: 1.3rem; color: var(--color-primary-dark);">✉️</span>
+                <div>
+                  <strong>Email Inquiries:</strong><br>
+                  hello@midevacosmetics.com<br>
+                  support@midevacosmetics.com
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <span style="font-size: 1.3rem; color: var(--color-primary-dark);">🕒</span>
+                <div>
+                  <strong>Boutique Hours:</strong><br>
+                  Monday – Saturday: 9:00 AM – 7:00 PM<br>
+                  Sunday: 11:00 AM – 5:00 PM
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Chat CTA -->
+          <div style="background: #fff; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border); text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">💬</div>
+            <h4 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Need Instant Beauty Advice?</h4>
+            <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 1.2rem;">
+              Chat directly with our skincare specialists on WhatsApp for instant routine recommendations and shade matching.
+            </p>
+            <a href="https://wa.me/254712345678?text=Hello%20Mideva%20Cosmetics,%20I%20would%20like%20skincare%20advice" class="btn btn-secondary btn-block" target="_blank" rel="noopener">
+              Chat on WhatsApp (+254 712 345 678)
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FAQ Section -->
+      <div style="margin-top: 5rem;">
+        <div class="section-header">
+          <span class="section-subtitle-tag">Got Questions?</span>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div style="max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
+          <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">How fast is delivery within Nairobi and upcountry Kenya?</h4>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin: 0;">
+              Orders placed before 2:00 PM in Nairobi are dispatched the same day, with delivery typically taking 2 to 4 hours. Deliveries outside Nairobi (Mombasa, Kisumu, Nakuru, Eldoret) arrive via expedited courier within 24 to 48 hours.
+            </p>
+          </div>
+
+          <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">Can I pay using Lipa na M-Pesa?</h4>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin: 0;">
+              Yes! We accept direct Lipa na M-Pesa payments, Visa, Mastercard, Apple Pay, and Cash on Delivery for addresses within the greater Nairobi metropolitan area.
+            </p>
+          </div>
+
+          <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">Are Mideva Cosmetics formulas suitable for sensitive skin?</h4>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin: 0;">
+              Absolutely. All our products are dermatologically tested, non-comedogenic, and 100% free from harsh sulfates, parabens, and irritating synthetic dyes. We always recommend patch testing new products on your inner forearm 24 hours prior to regular use.
+            </p>
+          </div>
+
+          <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">What is your return and exchange policy?</h4>
+            <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin: 0;">
+              We offer a hassle-free 7-day return policy for any unopened, factory-sealed products in their original packaging. For hygiene reasons, cosmetics and skincare products that have been unsealed or used cannot be returned.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.svg" alt="Mideva Cosmetics" width="220" height="50" style="filter: brightness(0) invert(1);">
+          </div>
+          <p>
+            Mideva Cosmetics is an international beauty brand crafted to celebrate natural radiance, skin confidence, and luxurious self-care through high-performance botanical essentials.
+          </p>
+          <div class="footer-socials">
+            <a href="https://instagram.com" class="social-link" title="Instagram">📸</a>
+            <a href="https://tiktok.com" class="social-link" title="TikTok">🎵</a>
+            <a href="https://facebook.com" class="social-link" title="Facebook">👥</a>
+            <a href="https://wa.me/254712345678" class="social-link" title="WhatsApp">💬</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="shop.html">Shop All Products</a></li>
+            <li><a href="shop.html?category=skincare">Skincare Rituals</a></li>
+            <li><a href="shop.html?category=makeup">Radiant Makeup</a></li>
+            <li><a href="about.html">About Mideva</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Customer Care</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Help Center & FAQs</a></li>
+            <li><a href="cart.html">View Shopping Bag</a></li>
+            <li><a href="wishlist.html">My Wishlist</a></li>
+            <li><a href="login.html">Sign In / Register</a></li>
+            <li><a href="contact.html">Shipping & Delivery</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Visit Our Boutique</h4>
+          <div class="footer-contact-item">
+            <span class="footer-contact-icon">📍</span>
+            <span>The Promenade, 4th Floor, General Mathenge Drive, Westlands, Nairobi, Kenya</span>
+          </div>
+          <div class="footer-contact-item">
+            <span class="footer-contact-icon">📞</span>
+            <span>+254 712 345 678</span>
+          </div>
+          <div class="footer-contact-item">
+            <span class="footer-contact-icon">✉️</span>
+            <span>hello@midevacosmetics.com</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 Mideva Cosmetics Ltd. All Rights Reserved.</div>
+        <div class="payment-badges">
+          <span class="payment-pill">M-PESA</span>
+          <span class="payment-pill">VISA</span>
+          <span class="payment-pill">MASTERCARD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Slide-over Cart Drawer -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+      <h3>
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        Your Shopping Bag
+      </h3>
+      <button class="btn-drawer-close" onclick="MidevaCart.closeDrawer()" aria-label="Close cart">✕</button>
+    </div>
+    <div id="cart-drawer-content" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;"></div>
+  </aside>
+
+  <!-- Search Modal -->
+  <div class="search-modal-overlay" id="search-modal">
+    <div class="search-modal-box">
+      <div class="search-modal-header">
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" style="color: var(--color-primary-dark);">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="global-search-input" class="search-modal-input" placeholder="Search products, ingredients...">
+        <button class="btn-close-search" aria-label="Close search">✕</button>
+      </div>
+      <div class="search-results-area" id="global-search-results"></div>
+    </div>
+  </div>
+
+  <script src="../js/products.js"></script>
+  <script src="../js/wishlist.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
